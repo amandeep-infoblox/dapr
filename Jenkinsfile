@@ -37,17 +37,17 @@ pipeline {
         dir ("$DIRECTORY") {
         withDockerRegistry([credentialsId: "dockerhub-bloxcicd", url: ""]) {
           sh "make docker-push GOOS='linux' GOARCH='amd64' "
-          finalizeBuild(
-            sh (
-              script: make list-of-images,
-              returnStdout: true
-              )
+        }
+        finalizeBuild(
+          sh (
+            script: make list-of-images,
+            returnStdout: true
             )
-          }
+          )
         }
       }
+     }
     }
-}
 
   post {
     cleanup {

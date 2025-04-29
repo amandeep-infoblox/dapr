@@ -34,19 +34,22 @@ pipeline {
       }
     stage("Build-And-Push-Docker") {
        steps {
+        dir ("$DIRECTORY") {
         withDockerRegistry([credentialsId: "dockerhub-bloxcicd", url: ""]) {
-          sh "cd $DIRECTORY && make docker-push GOOS='linux' GOARCH='amd64' "
+          sh "make docker-push GOOS='linux' GOARCH='amd64' "
+          finalizeBuild(
+            sh (
+              script: make list-of-images,
+              returnStdout: true
+              )
+            )
+          }
         }
       }
     }
-  }
+}
+
   post {
-    success {
-        finalizeBuild(sh(
-                script: 'make list-of-images',
-                returnStdout: true
-              ))
-    }
     cleanup {
       sh "cd $DIRECTORY && make clean GOOS='linux' GOARCH='amd64'"
     }

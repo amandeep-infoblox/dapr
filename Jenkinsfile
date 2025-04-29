@@ -37,17 +37,16 @@ pipeline {
         withDockerRegistry([credentialsId: "dockerhub-bloxcicd", url: ""]) {
           sh "cd $DIRECTORY && make docker-push GOOS='linux' GOARCH='amd64' "
         }
-        dir("${WORKSPACE}/${DIRECTORY}") {
-        archiveArtifacts artifacts: 'build/build.properties'
-        }
       }
+      archiveArtifacts artifacts: 'build.properties'
+      archiveArtifacts artifacts: 'chart/*.tgz'
     }
   
   }
   post {
     success {
       dir("${WORKSPACE}/${DIRECTORY}") {
-      finalizeBuild('', getFileList('build/*.properties'))
+        finalizeBuild()
       }
     }
     cleanup {

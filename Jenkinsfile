@@ -42,9 +42,10 @@ pipeline {
   }
   post {
     success {
-      dir("$DIRECTORY") {
-        finalizeBuild()
-      }
+        finalizeBuild(sh(
+                script: 'make list-of-images',
+                returnStdout: true
+              ))
     }
     cleanup {
       sh "cd $DIRECTORY && make clean GOOS='linux' GOARCH='amd64'"

@@ -39,15 +39,11 @@ pipeline {
         }
       }
       archiveArtifacts artifacts: 'build.properties'
-      archiveArtifacts artifacts: 'chart/*.tgz'
     }
-  
   }
   post {
     success {
-      dir("${WORKSPACE}/${DIRECTORY}") {
         finalizeBuild()
-      }
     }
     cleanup {
       sh "cd $DIRECTORY && make clean GOOS='linux' GOARCH='amd64'"

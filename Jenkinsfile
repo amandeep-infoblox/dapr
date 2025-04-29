@@ -38,12 +38,13 @@ pipeline {
           sh "cd $DIRECTORY && make docker-push GOOS='linux' GOARCH='amd64' "
         }
       }
-      archiveArtifacts artifacts: 'build.properties'
     }
   }
   post {
     success {
+      dir("$DIRECTORY") {
         finalizeBuild()
+      }
     }
     cleanup {
       sh "cd $DIRECTORY && make clean GOOS='linux' GOARCH='amd64'"

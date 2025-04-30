@@ -38,7 +38,6 @@ pipeline {
           withDockerRegistry([credentialsId: "dockerhub-bloxcicd", url: ""]) {
             sh "make docker-push GOOS='linux' GOARCH='amd64' "
           }
-          sh "make list-of-images"
         }
       }
     }
@@ -47,7 +46,11 @@ pipeline {
   post {
     success {
       dir("${WORKSPACE}/${DIRECTORY}"){
-        finalizeBuild("", sh(script: "make list-of-images", returnStdout: true).trim())
+        script {
+          def images = sh(script: "make list-of-images", returnStdout: true).trim()
+          echo "Docker images built: ${images}"
+          finalizeBuild(images)
+        }
       }
     }
     cleanup {

@@ -39,12 +39,14 @@ pipeline {
           sh "make docker-push GOOS='linux' GOARCH='amd64' "
         }
         sh "make list-of-images"
-        finalizeBuild()
       }
      }
     }
 
   post {
+    success {
+      finalizeBuild(sh(script: "$DIRECTORY/make list-of-images", returnStdout: true))
+    }
     cleanup {
       sh "cd $DIRECTORY && make clean GOOS='linux' GOARCH='amd64'"
     }

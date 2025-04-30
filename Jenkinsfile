@@ -41,13 +41,22 @@ pipeline {
         }
       }
     }
+    stage("List-Built-Images") {
+      steps {
+        dir ("$DIRECTORY") {
+          sh "make list-of-images > image_list.txt"
+          stash includes: 'image_list.txt', name: 'image-list'
+        }
+      }
+    }
   }
 
   post {
     success {
       dir("${WORKSPACE}/${DIRECTORY}"){
         script {
-          def images = sh(script: "make list-of-images", returnStdout: true).trim()
+          unstash 'image-list'
+          def images = readFile('image_list.txt').trim()
           echo "Docker images built: ${images}"
           finalizeBuild(images)
         }

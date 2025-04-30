@@ -37,15 +37,14 @@ pipeline {
         dir ("$DIRECTORY") {
           withDockerRegistry([credentialsId: "dockerhub-bloxcicd", url: ""]) {
             sh "make docker-push GOOS='linux' GOARCH='amd64' "
+            // Explicitly run list-of-images in the stage and output to console for debugging
+            sh '''
+              echo "Executing make list-of-images..."
+              pwd
+              make list-of-images
+              echo "Completed make list-of-images"
+            '''
           }
-        }
-      }
-    }
-    stage("List-Built-Images") {
-      steps {
-        dir ("$DIRECTORY") {
-          sh "make list-of-images > image_list.txt"
-          stash includes: 'image_list.txt', name: 'image-list'
         }
       }
     }
@@ -53,12 +52,15 @@ pipeline {
 
   post {
     success {
+      echo "Pipeline succeeded, executing finalizeBuild"
       dir("${WORKSPACE}/${DIRECTORY}"){
         script {
-          unstash 'image-list'
-          def images = readFile('image_list.txt').trim()
-          echo "Docker images built: ${images}"
+          echo "Running in directory: ${pwd()}"
+          echo "Executing make list-of-images for finalizeBuild..."
+          def images = sh(script: "make list-of-images", returnStdout: true).trim()
+          echo "Docker images to finalize: ${images}"
           finalizeBuild(images)
+          echo "finalizeBuild completed"
         }
       }
     }

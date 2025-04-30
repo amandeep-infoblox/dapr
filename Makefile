@@ -314,7 +314,6 @@ test:
 
 .PHONY: list-of-images
 list-of-images:
-	@echo "List of images:"
 	@echo $(DOCKER_IMAGE_TAG)
 	@echo $(DAPR_RUNTIME_DOCKER_IMAGE_TAG)
 	@echo $(DAPR_PLACEMENT_DOCKER_IMAGE_TAG)

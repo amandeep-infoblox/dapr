@@ -39,10 +39,7 @@ pipeline {
           sh "make docker-push GOOS='linux' GOARCH='amd64' "
         }
         finalizeBuild(
-          sh (
-            script: make list-of-images,
-            returnStdout: true
-            )
+          sh "make list-of-images"
           )
         }
       }
